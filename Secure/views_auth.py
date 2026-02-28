@@ -33,6 +33,7 @@ def user_login(request):
             # 🔐 IP Restriction Check
             print("ip")
             client_ip = get_client_ip(request)
+            print(client_ip,"ip")
 
             print(user,"entered here")
 
