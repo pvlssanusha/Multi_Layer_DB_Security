@@ -1,12 +1,5 @@
 from django.contrib import admin
-from .models import (
-    Role,
-    Permission,
-    RolePermission,
-    UserRole,
-    SQLQueryLog,
-    MLDetectionResult
-)
+from .models import *
 
 # -----------------------------
 # RBAC ADMIN CONFIG
@@ -17,7 +10,9 @@ class RoleAdmin(admin.ModelAdmin):
     list_display = ('role_name', 'description')
     search_fields = ('role_name',)
 
-
+@admin.register(SecureRecord)
+class SecureRecordAdmin(admin.ModelAdmin):
+    list_display = ("name", "created_by", "created_at")
 @admin.register(Permission)
 class PermissionAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')

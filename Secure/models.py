@@ -94,3 +94,12 @@ class MLDetectionResult(models.Model):
 
     def __str__(self):
         return f"{self.prediction} ({self.confidence_score})"
+    
+class SecureRecord(models.Model):
+    name = models.CharField(max_length=100)
+    secret_data = models.TextField()
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
