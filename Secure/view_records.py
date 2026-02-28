@@ -2,9 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from .models import SecureRecord, SQLQueryLog
-from .rbac import is_allowed
-
-from .rbac import get_user_role
+from .rbac import is_allowed, get_user_role
 
 
 @login_required
@@ -18,7 +16,6 @@ def records_page(request):
         action = "INSERT"
         allowed = is_allowed(request.user, action)
 
-        # Log the query attempt
         SQLQueryLog.objects.create(
             user=request.user,
             query_text="INSERT INTO SecureRecord (...)",
