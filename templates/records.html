@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure Records</title>
+</head>
+<body>
+
+<h2>Welcome {{ request.user.username }}</h2>
+<h3>Your Role: {{ role }}</h3>
+
+<hr>
+
+<h2>All Records</h2>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Secret Data</th>
+        <th>Created By</th>
+        <th>Action</th>
+    </tr>
+
+    {% for record in records %}
+    <tr>
+        <td>{{ record.id }}</td>
+        <td>{{ record.name }}</td>
+        <td>{{ record.secret_data }}</td>
+        <td>{{ record.created_by }}</td>
+        <td>
+            {% if can_delete %}
+                <a href="{% url 'delete_record' record.id %}">Delete</a>
+            {% else %}
+                Not Allowed
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<hr>
+
+{% if can_insert %}
+<h2>Add New Record</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="add_record" value="1">
+
+    <label>Name:</label><br>
+    <input type="text" name="name" required><br><br>
+
+    <label>Secret Data:</label><br>
+    <textarea name="secret_data" required></textarea><br><br>
+
+    <button type="submit">Add Record</button>
+</form>
+{% else %}
+<h3>You do not have permission to add records.</h3>
+{% endif %}
+
+<br><br>
+<a href="/logout/">Logout</a>
+
+</body>
+</html>

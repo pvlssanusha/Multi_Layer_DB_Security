@@ -1,19 +1,32 @@
-from .models import UserRole
+from .models import UserRole, RolePermission, Permission
 
-ROLE_PERMISSIONS = {
-    "Admin": {"SELECT", "INSERT", "UPDATE", "DELETE"},
-    "Analyst": {"SELECT"},
-    "User": {"SELECT"},
-}
 
 def get_user_role(user):
+    """
+    Returns the Role object assigned to the user.
+    """
     try:
-        return UserRole.objects.get(user=user).role.role_name
+        return UserRole.objects.get(user=user).role
     except UserRole.DoesNotExist:
         return None
 
-def is_allowed(user, action):
+
+def is_allowed(user, action_name):
+    """
+    Checks if a user has permission for a given action
+    by querying RolePermission table.
+    """
+
     role = get_user_role(user)
     if not role:
         return False
-    return action in ROLE_PERMISSIONS.get(role, set())
+
+    try:
+        permission = Permission.objects.get(name=action_name)
+    except Permission.DoesNotExist:
+        return False
+
+    return RolePermission.objects.filter(
+        role=role,
+        permission=permission
+    ).exists()
