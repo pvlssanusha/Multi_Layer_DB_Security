@@ -8,6 +8,9 @@ from django.contrib.auth.models import User
 class Role(models.Model):
     role_name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
+    allowed_ip = models.GenericIPAddressField(null=True, blank=True)
+    login_start_time = models.TimeField(null=True, blank=True)
+    login_end_time = models.TimeField(null=True, blank=True)
 
     def __str__(self):
         return self.role_name

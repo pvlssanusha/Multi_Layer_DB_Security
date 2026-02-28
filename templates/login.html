@@ -9,6 +9,13 @@
     {% if error %}
         <p style="color:red;">{{ error }}</p>
     {% endif %}
+    {% if messages %}
+    {% for message in messages %}
+        <div style="color:red;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
 
     <form method="post">
         {% csrf_token %}
