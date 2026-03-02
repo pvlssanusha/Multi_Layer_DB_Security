@@ -5,6 +5,10 @@ from .models import UserRole
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from .models import *
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
@@ -13,6 +17,46 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+
+
+
+def user_signup(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        # Password match check
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect("signup")
+
+        # Check if user already exists
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect("signup")
+
+        # Create user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        # Assign default role = User
+        try:
+            default_role = Role.objects.get(role_name="User")
+            UserRole.objects.create(user=user, role=default_role)
+        except Role.DoesNotExist:
+            messages.error(request, "Default role not found. Contact admin.")
+            user.delete()
+            return redirect("signup")
+
+        messages.success(request, "Account created successfully. Please login.")
+        return redirect("login")
+
+    return render(request, "signup.html")
 
 def user_login(request):
     if request.method == "POST":

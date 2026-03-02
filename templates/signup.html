@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login</title>
+<title>Signup</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -15,7 +15,7 @@
     margin: 0;
   }
 
-  .login-box {
+  .signup-box {
     background: white;
     padding: 36px 32px;
     border-radius: 8px;
@@ -55,6 +55,7 @@
   }
 
   input[type="text"],
+  input[type="email"],
   input[type="password"] {
     width: 100%;
     padding: 9px 12px;
@@ -68,26 +69,6 @@
   }
 
   input:focus { border-color: #4a90e2; }
-
-  .row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    font-size: 13px;
-  }
-
-  .row label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: normal;
-    color: #555;
-    margin: 0;
-  }
-
-  .row a { color: #4a90e2; text-decoration: none; }
-  .row a:hover { text-decoration: underline; }
 
   button[type="submit"] {
     width: 100%;
@@ -103,60 +84,52 @@
 
   button[type="submit"]:hover { background: #357abd; }
 
-  .signup {
+  .login {
     text-align: center;
     margin-top: 20px;
     font-size: 13px;
     color: #666;
   }
 
-  .signup a { color: #4a90e2; text-decoration: none; font-weight: 600; }
-  .signup a:hover { text-decoration: underline; }
+  .login a { color: #4a90e2; text-decoration: none; font-weight: 600; }
+  .login a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
-    
-<div class="login-box">
+<div class="signup-box">
 
-{% if error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
-    {% if messages %}
+  {% if messages %}
     {% for message in messages %}
-        <div style="color:red;">
-            {{ message }}
-        </div>
+      <div class="error">{{ message }}</div>
     {% endfor %}
-{% endif %}
-
-  <h2>Welcome Back</h2>
-  <p class="sub">Sign in to your account</p>
-
-  {% if error %}
-  <div class="error">{{ error }}</div>
   {% endif %}
 
-  <form method="post">
+  <h2>Create Account</h2>
+  <!-- <p class="sub">Sign up for free today</p> -->
+
+  <form method="POST">
     {% csrf_token %}
 
     <label for="username">Username</label>
     <input type="text" id="username" name="username" placeholder="Enter your username" required>
 
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
     <label for="password">Password</label>
     <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
-    <div class="row">
-      <label><input type="checkbox"> Remember me</label>
-      <a href="#">Forgot password?</a>
-    </div>
+    <label for="confirm_password">Confirm Password</label>
+    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
 
-    <button type="submit">Sign In</button>
+    <button type="submit">Sign Up</button>
   </form>
 
-  <div class="signup">
-    Don't have an account? <a href="/signup">Sign up</a>
+  <div class="login">
+    Already have an account? <a href="{% url 'login' %}">Login</a>
   </div>
+
 </div>
 
 </body>
