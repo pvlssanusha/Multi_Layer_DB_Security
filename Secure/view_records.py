@@ -1,9 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from .models import SecureRecord, SQLQueryLog
+from .models import *
 from .rbac import is_allowed, get_user_role
+from .ml_model import predict_query
+from django.contrib import messages
+from django.shortcuts import redirect
 
+from django.contrib import messages
+from django.shortcuts import redirect
 
 @login_required
 def records_page(request):
@@ -15,19 +20,45 @@ def records_page(request):
 
         action = "INSERT"
         allowed = is_allowed(request.user, action)
+        name=request.POST.get("name"),
+        secret_data=request.POST.get("secret_data"),
+        query_text=f"INSERT INTO SecureRecord VALUES ({name}, {secret_data})"
+        is_malicious, confidence = predict_query(query_text)
+        print("checking malicious or not")
+        print(is_malicious)
+        print("confidence",confidence)
 
-        SQLQueryLog.objects.create(
+        # 🔥 Final Decision
+        final_decision = "ALLOWED"
+        if not is_allowed or is_malicious:
+            final_decision = "BLOCKED"
+        query_log=SQLQueryLog.objects.create(
             user=request.user,
-            query_text="INSERT INTO SecureRecord (...)",
+           query_text=f"INSERT INTO SecureRecord VALUES ({name}, {secret_data})",
             query_type=action,
             is_allowed_by_rbac=allowed,
-            is_malicious_ml=False,
-            final_decision="ALLOWED" if allowed else "BLOCKED"
+            is_malicious_ml=is_malicious,
+            final_decision=final_decision
         )
-
+        MLDetectionResult.objects.create(
+            query_log=query_log,
+           prediction = "MALICIOUS" if is_malicious else "BENIGN",
+            confidence_score=confidence,
+            model_version="v1.0"
+        )
         if not allowed:
-            return HttpResponseForbidden("INSERT not allowed")
+            messages.error(request, "⚠ INSERT operation is not allowed.")
+            return redirect(request.META.get('HTTP_REFERER', '/'))
 
+        if is_malicious:
+            messages.error(request, "🚫 Malicious input detected! Please check your input.")
+            return redirect(request.META.get('HTTP_REFERER', '/'))
+
+        
+
+        
+
+       
         SecureRecord.objects.create(
             name=request.POST.get("name"),
             secret_data=request.POST.get("secret_data"),
@@ -55,13 +86,13 @@ def records_page(request):
         return HttpResponseForbidden("SELECT not allowed")
 
     records = SecureRecord.objects.all()
-
     return render(request, "records.html", {
-        "records": records,
-        "can_insert": is_allowed(request.user, "INSERT"),
-        "can_delete": is_allowed(request.user, "DELETE"),
-        "role": get_user_role(request.user)
-    })
+    "records": records,
+    "can_insert": is_allowed(request.user, "INSERT"),
+    "can_delete": is_allowed(request.user, "DELETE"),
+    "can_update": is_allowed(request.user, "UPDATE"),   # ✅ ADD THIS
+    "role": get_user_role(request.user)
+})
 
 
 @login_required

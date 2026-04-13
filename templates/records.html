@@ -3,273 +3,796 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Records</title>
+<title>SecureDB — Records</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --primary: #2541b2;
+    --primary-light: #3d5ce8;
+    --accent: #4f7cff;
+    --surface: #ffffff;
+    --surface-2: #eef2ff;
+    --surface-3: #dde5ff;
+    --border: #c7d4ff;
+    --text-primary: #111827;
+    --text-secondary: #3b4db8;
+    --text-muted: #6b7ff0;
+    --danger: #dc2626;
+    --danger-bg: #fff0f0;
+    --danger-border: #fca5a5;
+    --warning-bg: #fffbea;
+    --warning-border: #fde68a;
+    --warning-text: #78350f;
+    --success: #15803d;
+    --info-bg: #eef2ff;
+    --shadow: 0 2px 12px rgba(44,62,200,0.09);
+    --shadow-md: 0 4px 20px rgba(44,62,200,0.13);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
-    margin: 0;
-    padding: 24px;
-    color: #333;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    min-height: 100vh;
   }
 
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  /* Top bar */
-  .topbar {
-    background: white;
-    padding: 14px 20px;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  /* ===== TOP NAV ===== */
+  .navbar {
+    background: var(--primary);
+    border-bottom: 2px solid var(--primary-light);
+    padding: 0 32px;
+    height: 62px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 18px rgba(37,65,178,0.25);
   }
 
-  .topbar-left h1 {
-    font-size: 18px;
-    margin: 0 0 2px;
-    color: #222;
-  }
-
-  .topbar-left span {
-    font-size: 13px;
-    color: #888;
-  }
-
-  .topbar-right {
+  .nav-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 13px;
+    gap: 11px;
+    text-decoration: none;
   }
 
-  .role-badge {
-    background: #eef4ff;
-    color: #4a90e2;
-    padding: 4px 10px;
-    border-radius: 12px;
+  .nav-logo {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .nav-logo svg { width: 18px; height: 18px; }
+
+  .nav-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.2px;
+  }
+
+  .nav-subtitle {
+    font-size: 10.5px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #b0c4ff;
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+    background: rgba(255,255,255,0.22);
+    border: 2px solid rgba(255,255,255,0.45);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .user-meta { line-height: 1; }
+
+  .user-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .user-time {
+    font-size: 11px;
+    color: #b0c4ff;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 2px;
+  }
+
+  .role-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.18);
+    color: #ffffff;
+    padding: 5px 12px;
+    border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
-    border: 1px solid #c9dffe;
+    border: 1px solid rgba(255,255,255,0.35);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.3px;
+  }
+
+  .role-pill::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #7effc5;
+    box-shadow: 0 0 0 2px rgba(126,255,197,0.3);
   }
 
   .logout-btn {
-    color: #e74c3c;
-    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.13);
+    color: #ffe0e0;
+    border: 1px solid rgba(255,150,150,0.35);
+    padding: 6px 13px;
+    border-radius: 7px;
     font-size: 13px;
-    padding: 5px 12px;
-    border: 1px solid #f5c2c2;
-    border-radius: 5px;
-    background: #fff0f0;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
   }
 
-  .logout-btn:hover { background: #ffe0e0; }
+  .logout-btn:hover { background: rgba(255,80,80,0.18); }
 
-  /* Card */
+  /* ===== PAGE BODY ===== */
+  .page-body {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 28px 24px 48px;
+  }
+
+  /* Page heading */
+  .page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+
+  .page-heading h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  .page-heading p {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .stat-card.blue .stat-value { color: var(--accent); }
+  .stat-card.green .stat-value { color: var(--success); }
+  .stat-card.red .stat-value { color: var(--danger); }
+
+  /* ===== CARDS ===== */
   .card {
-    background: white;
+    background: var(--surface);
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 17px 22px;
+    border-bottom: 1.5px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .card-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.1px;
+  }
+
+  .card-title-icon {
+    width: 30px;
+    height: 30px;
+    background: var(--surface-3);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+  }
+
+  .card-title-icon svg { width: 15px; height: 15px; }
+
+  .record-count {
+    font-size: 12px;
+    background: var(--surface-3);
+    color: var(--primary);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Alert messages */
+  .alert-wrap { padding: 14px 22px 0; }
+
+  .alert-danger {
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    color: var(--danger);
+    padding: 10px 14px;
     border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    padding: 20px;
-    margin-bottom: 24px;
+    font-size: 13px;
+    margin-bottom: 10px;
+    font-weight: 500;
   }
 
-  .card h2 {
-    font-size: 16px;
-    margin: 0 0 16px;
-    color: #222;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-  }
+  /* ===== TABLE ===== */
+  .table-wrap { overflow-x: auto; }
 
-  /* Table */
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
   }
 
-  thead tr {
-    background: #f8f9fa;
+  thead {
+    background: var(--surface-3);
+    border-bottom: 2px solid var(--border);
   }
 
   th {
-    text-align: left;
-    padding: 10px 12px;
-    font-size: 12px;
+    padding: 12px 20px;
+    font-size: 11px;
     font-weight: 700;
-    color: #666;
+    color: var(--primary);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 2px solid #eee;
+    letter-spacing: 0.7px;
+    text-align: left;
+    white-space: nowrap;
   }
 
   td {
-    padding: 11px 12px;
-    border-bottom: 1px solid #f0f0f0;
-    color: #333;
+    padding: 13px 20px;
+    font-size: 13.5px;
+    color: var(--text-primary);
+    border-bottom: 1.5px solid var(--surface-2);
+    vertical-align: middle;
   }
 
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #fafafa; }
+  tbody tr:last-child td { border-bottom: none; }
 
-  .delete-link {
-    color: #e74c3c;
-    text-decoration: none;
-    font-size: 13px;
+  tbody tr:hover td { background: #f0f4ff; }
+
+  tbody tr { transition: background 0.15s; }
+
+  .id-cell {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--accent);
     font-weight: 600;
   }
 
-  .delete-link:hover { text-decoration: underline; }
+  .name-cell {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .secret-cell {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .secret-mask {
+    display: inline-block;
+    background: var(--surface-3);
+    color: var(--primary);
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid var(--border);
+    font-weight: 600;
+  }
+
+  .secret-mask:hover { background: #c5d3ff; }
+
+  .creator-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--info-bg);
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .action-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--danger);
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 6px;
+    transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-delete:hover { background: #ffd6d6; }
+
+  .btn-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #1d40de;
+    background: #dde5ff;
+    border: 1px solid #b3c4ff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 6px;
+    transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-edit:hover { background: #c5d3ff; }
 
   .no-action {
-    color: #bbb;
-    font-size: 13px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-style: italic;
   }
 
-  /* Form */
-  .form-group {
-    margin-bottom: 16px;
-  }
-
-  label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: #444;
-    margin-bottom: 5px;
-  }
-
-  input[type="text"],
-  textarea {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  .empty-row td {
+    text-align: center;
+    padding: 48px;
+    color: var(--text-secondary);
     font-size: 14px;
-    box-sizing: border-box;
-    outline: none;
-    font-family: Arial, sans-serif;
-    transition: border-color 0.2s;
   }
 
-  input[type="text"]:focus,
-  textarea:focus { border-color: #4a90e2; }
+  .empty-icon {
+    display: block;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
 
-  textarea { resize: vertical; min-height: 90px; }
+  /* ===== ADD RECORD FORM ===== */
+  .form-body { padding: 22px; }
 
-  button[type="submit"] {
-    background: #4a90e2;
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 7px;
+    letter-spacing: 0.1px;
+  }
+
+  .form-group input[type="text"],
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-primary);
+    background: var(--surface-2);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+
+  .form-group input[type="text"]:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(79,124,255,0.15);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: var(--text-muted); }
+
+  .form-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--primary);
     color: white;
     border: none;
-    padding: 9px 22px;
-    border-radius: 5px;
+    padding: 10px 22px;
+    border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
     cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 2px 10px rgba(37,65,178,0.25);
   }
 
-  button[type="submit"]:hover { background: #357abd; }
+  .btn-submit:hover {
+    background: var(--primary-light);
+    box-shadow: 0 4px 16px rgba(37,65,178,0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-submit:active { transform: translateY(0); }
 
   .no-permission {
-    background: #fffbea;
-    border: 1px solid #f0d58c;
-    color: #7d5c00;
-    padding: 12px 16px;
-    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    color: var(--warning-text);
+    padding: 14px 18px;
+    border-radius: 9px;
     font-size: 14px;
+    font-weight: 500;
+    margin: 22px;
   }
 
-  .empty {
-    text-align: center;
-    color: #aaa;
-    padding: 30px;
-    font-size: 14px;
+  /* Responsive */
+  @media (max-width: 700px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .navbar { padding: 0 16px; }
+    .page-body { padding: 16px; }
+    .user-meta { display: none; }
   }
 </style>
 </head>
 <body>
-<div class="container">
 
-  <!-- Top bar -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <h1>Secure Records</h1>
-      <span>Hello, {{ request.user.username }}</span>
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <a href="#" class="nav-brand">
+    <div class="nav-logo">
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="11" width="18" height="11" rx="2" fill="white" opacity="0.9"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="12" cy="16" r="1.5" fill="#2541b2"/>
+      </svg>
     </div>
-    <div class="topbar-right">
-      <span class="role-badge">{{ role }}</span>
-      <a href="/logout/" class="logout-btn">Logout</a>
+    <div>
+      <div class="nav-title">SecureDB</div>
+      <div class="nav-subtitle">RECORDS MANAGEMENT</div>
+    </div>
+  </a>
+
+  <div class="nav-right">
+    <div class="user-info">
+      <div class="user-avatar">{{ request.user.username|slice:":1"|upper }}</div>
+      <div class="user-meta">
+        <div class="user-name">{{ request.user.username }}</div>
+        <div class="user-time" id="navTime">—</div>
+      </div>
+    </div>
+    <span class="role-pill">{{ role }}</span>
+    <a href="/logout/" class="logout-btn">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      Logout
+    </a>
+  </div>
+</nav>
+
+<!-- ===== PAGE BODY ===== -->
+<div class="page-body">
+
+  <!-- Heading -->
+  <div class="page-heading">
+    <div>
+      <h1>Secure Records</h1>
+      <p>Manage and view protected database entries based on your access level</p>
+    </div>
+    <a href="/dashboard/" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--primary);font-weight:600;text-decoration:none;background:var(--surface);padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);">
+      <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/></svg>
+      Dashboard
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card blue">
+      <div class="stat-label">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+        Total Records
+      </div>
+      <div class="stat-value">{{ records|length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        Access Role
+      </div>
+      <div class="stat-value" style="font-size:15px;font-family:'DM Sans',sans-serif;font-weight:700;color:var(--primary)">{{ role }}</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+        Can Write
+      </div>
+      <div class="stat-value">{% if can_insert %}Yes{% else %}No{% endif %}</div>
+    </div>
+    <div class="stat-card {% if can_delete %}red{% endif %}">
+      <div class="stat-label">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+        Can Delete
+      </div>
+      <div class="stat-value">{% if can_delete %}Yes{% else %}No{% endif %}</div>
     </div>
   </div>
 
   <!-- Records Table -->
   <div class="card">
-    <h2>All Records</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Secret Data</th>
-          <th>Created By</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for record in records %}
-        <tr>
-          <td>{{ record.id }}</td>
-          <td>{{ record.name }}</td>
-          <td>{{ record.secret_data }}</td>
-          <td>{{ record.created_by }}</td>
-          <td>
-            {% if can_delete %}
-              <a href="{% url 'delete_record' record.id %}" class="delete-link">Delete</a>
-            {% else %}
-              <span class="no-action">Not allowed</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="5" class="empty">No records found.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="card-header">
+      <div class="card-title">
+        <div class="card-title-icon">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+        </div>
+        All Records
+      </div>
+      <span class="record-count">{{ records|length }} entries</span>
+    </div>
+
+    {% if messages %}
+    <div class="alert-wrap">
+      {% for message in messages %}
+      <div class="alert-danger">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Record Name</th>
+            <th>Secret Data</th>
+            <th>Created By</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+          <tr>
+            <td class="id-cell">#{{ record.id }}</td>
+            <td class="name-cell">{{ record.name }}</td>
+            <td>
+              <span class="secret-mask" onclick="toggleSecret(this, '{{ record.secret_data }}')">●●●●●●●●</span>
+            </td>
+            <td>
+              <span class="creator-badge">
+                <svg width="10" height="10" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+                {{ record.created_by }}
+              </span>
+            </td>
+            <td>
+              <div class="action-cell">
+                {% if can_delete %}
+                <a href="{% url 'delete_record' record.id %}" class="btn-delete">
+                  <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                  Delete
+                </a>
+                {% endif %}
+                {% if can_update %}
+                <a href="{% url 'edit_record' record.id %}" class="btn-edit">
+                  <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+                  Edit
+                </a>
+                {% endif %}
+                {% if not can_delete and not can_update %}
+                <span class="no-action">— View only</span>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr class="empty-row">
+            <td colspan="5">
+              <span class="empty-icon">🗂️</span>
+              No records found in the database.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Add Record -->
   <div class="card">
-    <h2>Add New Record</h2>
+    <div class="card-header">
+      <div class="card-title">
+        <div class="card-title-icon">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+        </div>
+        Add New Record
+      </div>
+      {% if can_insert %}
+      <span style="font-size:12px;color:#15803d;font-weight:600;background:#f0fdf4;padding:4px 10px;border-radius:6px;border:1px solid #86efac;">
+        ✓ Insert permitted
+      </span>
+      {% endif %}
+    </div>
+
     {% if can_insert %}
-    <form method="post">
-      {% csrf_token %}
-      <input type="hidden" name="add_record" value="1">
+    <div class="form-body">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="add_record" value="1">
 
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter record name" required>
-      </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Record Name</label>
+            <input type="text" id="name" name="name" placeholder="e.g. Patient Record, Config Key..." required>
+          </div>
+          <div class="form-group">
+            <label for="secret_data">Secret / Encrypted Data</label>
+            <textarea id="secret_data" name="secret_data" placeholder="Enter sensitive data to store securely..." required></textarea>
+          </div>
+        </div>
 
-      <div class="form-group">
-        <label for="secret_data">Secret Data</label>
-        <textarea id="secret_data" name="secret_data" placeholder="Enter secret data..." required></textarea>
-      </div>
-
-      <button type="submit">Add Record</button>
-    </form>
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+            Add Record
+          </button>
+          <span style="font-size:12.5px;color:var(--text-secondary);">This action will be logged for audit purposes.</span>
+        </div>
+      </form>
+    </div>
     {% else %}
-    <div class="no-permission">⚠ You do not have permission to add records.</div>
+    <div class="no-permission">
+      <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+      Your role <strong>{{ role }}</strong> does not have INSERT permission on this table.
+    </div>
     {% endif %}
   </div>
 
 </div>
+
+<script>
+function updateTime() {
+  const el = document.getElementById('navTime');
+  if (el) el.textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+updateTime();
+setInterval(updateTime, 30000);
+
+function toggleSecret(el, data) {
+  if (el.dataset.revealed === '1') {
+    el.textContent = '●●●●●●●●';
+    el.dataset.revealed = '0';
+    el.title = 'Click to reveal';
+  } else {
+    el.textContent = data;
+    el.dataset.revealed = '1';
+    el.title = 'Click to hide';
+    setTimeout(() => {
+      el.textContent = '●●●●●●●●';
+      el.dataset.revealed = '0';
+    }, 8000);
+  }
+}
+</script>
 </body>
 </html>

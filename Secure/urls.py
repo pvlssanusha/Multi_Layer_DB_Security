@@ -1,6 +1,7 @@
 from django.urls import path
 from .views_auth import *
 from . import views
+from .views import *
 from .view_records import *
 urlpatterns = [
     path("", user_login, name="index"),
@@ -9,4 +10,6 @@ urlpatterns = [
     path("records/", records_page, name="records"),
     path("signup/", user_signup, name="signup"),
     path("records/delete/<int:record_id>/", delete_record, name="delete_record"),
+    path("dashboard/", dashboard, name="dashboard"),
+    path("edit/<int:record_id>/", edit_record, name="edit_record"),
 ]

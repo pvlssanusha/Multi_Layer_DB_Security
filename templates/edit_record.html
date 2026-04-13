@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureDB — Edit Record</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #2541b2;
+    --primary-light: #3d5ce8;
+    --accent: #4f7cff;
+    --surface: #ffffff;
+    --surface-2: #eef2ff;
+    --surface-3: #dde5ff;
+    --border: #c7d4ff;
+    --text-primary: #111827;
+    --text-secondary: #3b4db8;
+    --text-muted: #6b7ff0;
+    --danger: #dc2626;
+    --shadow: 0 2px 12px rgba(37,65,178,0.09);
+    --shadow-lg: 0 8px 40px rgba(37,65,178,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface-2);
+    min-height: 100vh;
+    color: var(--text-primary);
+  }
+
+  /* NAVBAR */
+  .navbar {
+    background: var(--primary);
+    border-bottom: 2px solid var(--primary-light);
+    padding: 0 32px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 18px rgba(37,65,178,0.25);
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+  }
+
+  .nav-logo {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-logo svg { width: 18px; height: 18px; }
+
+  .nav-title { font-size: 16px; font-weight: 700; color: #ffffff; }
+  .nav-subtitle {
+    font-size: 10.5px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #b0c4ff;
+    letter-spacing: 0.5px;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #e0e8ff;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.12);
+    transition: background 0.2s;
+  }
+
+  .back-btn:hover { background: rgba(255,255,255,0.2); color: #ffffff; }
+
+  /* PAGE */
+  .page-body {
+    max-width: 680px;
+    margin: 40px auto;
+    padding: 0 20px;
+    animation: slideUp 0.35s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 22px;
+  }
+
+  .breadcrumb a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .breadcrumb-sep { color: var(--border); }
+
+  /* Card */
+  .edit-card {
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .edit-card-header {
+    padding: 22px 28px;
+    border-bottom: 1.5px solid var(--border);
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .header-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 12px rgba(37,65,178,0.25);
+    flex-shrink: 0;
+  }
+
+  .header-icon svg { width: 22px; height: 22px; }
+
+  .header-text h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+  }
+
+  .header-text p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+  }
+
+  .record-id-tag {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--surface-3);
+    border: 1.5px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 20px;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .edit-form { padding: 28px; }
+
+  .form-group { margin-bottom: 22px; }
+
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+    letter-spacing: 0.1px;
+  }
+
+  .form-label svg {
+    color: var(--text-muted);
+    width: 13px;
+    height: 13px;
+  }
+
+  .form-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 4px;
+  }
+
+  input[type="text"],
+  textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-primary);
+    background: var(--surface-2);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+
+  input[type="text"]:focus,
+  textarea:focus {
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(79,124,255,0.15);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 110px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* Audit warning box */
+  .audit-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #fffbea;
+    border: 1px solid #fde68a;
+    border-radius: 9px;
+    padding: 13px 16px;
+    margin-bottom: 22px;
+    font-size: 13px;
+    color: #78350f;
+  }
+
+  .audit-box svg { flex-shrink: 0; margin-top: 1px; }
+  .audit-box strong { font-weight: 600; }
+
+  /* Actions */
+  .form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 6px;
+    gap: 12px;
+  }
+
+  .btn-update {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 11px 26px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 2px 12px rgba(37,65,178,0.25);
+  }
+
+  .btn-update:hover {
+    background: var(--primary-light);
+    box-shadow: 0 4px 18px rgba(37,65,178,0.32);
+    transform: translateY(-1px);
+  }
+
+  .btn-update:active { transform: translateY(0); }
+
+  .btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 18px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .btn-cancel:hover {
+    background: var(--surface-3);
+    border-color: var(--accent);
+    color: var(--primary);
+  }
+
+  .card-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0 22px;
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/records/" class="nav-brand">
+    <div class="nav-logo">
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="11" width="18" height="11" rx="2" fill="white" opacity="0.9"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="12" cy="16" r="1.5" fill="#2541b2"/>
+      </svg>
+    </div>
+    <div>
+      <div class="nav-title">SecureDB</div>
+      <div class="nav-subtitle">RECORDS MANAGEMENT</div>
+    </div>
+  </a>
+  <a href="/records/" class="back-btn">
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    Back to Records
+  </a>
+</nav>
+
+<div class="page-body">
+
+  <div class="breadcrumb">
+    <a href="/records/">Records</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Edit Record</span>
+    <span class="breadcrumb-sep">›</span>
+    <span style="font-family:'JetBrains Mono',monospace;">#{{ record.id }}</span>
+  </div>
+
+  <div class="edit-card">
+    <div class="edit-card-header">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h2>Edit Record</h2>
+        <p>Modify the name or secret data for this entry</p>
+      </div>
+      <span class="record-id-tag">ID: #{{ record.id }}</span>
+    </div>
+
+    <div class="edit-form">
+
+      <div class="audit-box">
+        <svg width="16" height="16" fill="#b45309" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+          <strong>Audit Notice:</strong> Changes to this record will be logged with your username, timestamp, and IP address for security compliance.
+        </div>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label">
+            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+            Record Name
+            <span class="form-hint">— Identifier for this record</span>
+          </label>
+          <input type="text" name="name" value="{{ record.name }}" required placeholder="Enter record name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+            Secret / Encrypted Data
+            <span class="form-hint">— Sensitive payload</span>
+          </label>
+          <textarea name="secret_data" required placeholder="Enter secret data...">{{ record.secret_data }}</textarea>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="form-actions">
+          <a href="/records/" class="btn-cancel">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            Cancel
+          </a>
+          <button type="submit" class="btn-update">
+            <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            Save Changes
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
